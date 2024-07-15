@@ -2,7 +2,7 @@
 
 /**
  * Controller for the calendar page
- * 
+ *
  * @author Aaron Carlino
  * @author Grant Heggie
  * @package silverstripe-event-calendar
@@ -27,7 +27,7 @@ use SilverStripe\ORM\DataObject;
 use SilverStripe\View\Requirements;
 use \PageController;
 
-class CalendarController extends PageController 
+class CalendarController extends PageController
 {
 	private static $allowed_actions = [
 		'show',
@@ -42,7 +42,7 @@ class CalendarController extends PageController
 		'monthjson',
 		'MonthJumpForm'
 	];
-	
+
 	/**
 	 * @var string
 	 */
@@ -152,8 +152,8 @@ class CalendarController extends PageController
 			$event->Title = strip_tags($event->DateRange()) . " : " . $event->getTitle();
 			$event->Description = $event->getContent();
 		}
-		$rssTitle = $this->RSSTitle 
-			? $this->RSSTitle 
+		$rssTitle = $this->RSSTitle
+			? $this->RSSTitle
 			: sprintf(
 				_t(Calendar::class.'.UPCOMINGEVENTSFOR', "Upcoming Events for %s"),
 				$this->Title
@@ -171,7 +171,7 @@ class CalendarController extends PageController
 		$xml = preg_replace('/<!--(.|\s)*?-->/', '', $xml);
 		$xml = trim($xml);
 		HTTP::add_cache_headers();
-		
+
 		return $this->getResponse()
 			->addHeader('Content-Type', 'application/rss+xml')
 			->setBody($xml);
@@ -194,7 +194,7 @@ class CalendarController extends PageController
 		);
 		$this->endDate = Carbon::parse($this->startDate)->endOfMonth();
 
-		
+
 		$counter = clone $this->startDate;
 		while ($counter->getTimestamp() <= $this->endDate->getTimestamp()) {
 			$d = $counter->toDateString();
@@ -292,9 +292,9 @@ class CalendarController extends PageController
 	protected function getRangeLink($start, $end)
 	{
 		return parent::join_links(
-			$this->Link(), 
-			"show", 
-			$start->format('Ymd'), 
+			$this->Link(),
+			"show",
+			$start->format('Ymd'),
 			$end->format('Ymd')
 		);
 	}
@@ -381,7 +381,7 @@ class CalendarController extends PageController
  			} else {
  				$this->getResponse()->addHeader("Content-disposition", "attachment; filename=".$FILENAME);
 			}
-			
+
 			$result = trim(strip_tags($this->customise(
 				[
 					'HOST' => $HOST,
@@ -402,7 +402,7 @@ class CalendarController extends PageController
 
 			return $result;
 		}
-		
+
 		$this->redirectBack();
 	}
 
@@ -483,22 +483,22 @@ class CalendarController extends PageController
 		switch ($this->view) {
 			case "day":
 				return CalendarUtil::localize(
-					$this->startDate->getTimestamp(), 
-					null, 
+					$this->startDate->getTimestamp(),
+					null,
 					CalendarUtil::ONE_DAY_HEADER
 				);
 				break;
 			case "month":
 				return CalendarUtil::localize(
-					$this->startDate->getTimestamp(), 
-					null, 
+					$this->startDate->getTimestamp(),
+					null,
 					CalendarUtil::MONTH_HEADER
 				);
 				break;
 			case "year":
 				return CalendarUtil::localize(
-					$this->startDate->getTimestamp(), 
-					null, 
+					$this->startDate->getTimestamp(),
+					null,
 					CalendarUtil::YEAR_HEADER
 				);
 				break;
@@ -587,7 +587,7 @@ class CalendarController extends PageController
 	private function getMonthLink($start)
 	{
 		return parent::join_links(
-			$this->Link(), 
+			$this->Link(),
 			"show",
 			$start->format('Ym')
 		);
@@ -619,20 +619,20 @@ class CalendarController extends PageController
 				return $this->startDate->toDateString() == $this->endDate->toDateString();
 			case "week":
 				if (CalendarUtil::get_first_day_of_week() == Carbon::MONDAY) {
-					return 
-						($this->startDate->format('w') == Carbon::MONDAY) 
+					return
+						($this->startDate->format('w') == Carbon::MONDAY)
 						&& ($this->startDate->format('w') == Carbon::SUNDAY);
 				}
-				return 
-					($this->startDate->format('w') == Carbon::SUNDAY) 
+				return
+					($this->startDate->format('w') == Carbon::SUNDAY)
 					&& ($this->endDate->format('w') == Carbon::SATURDAY);
 			case "month":
-				return 
-					($this->startDate->format('j') == 1) 
+				return
+					($this->startDate->format('j') == 1)
 					&& (Carbon::parse($this->startDate)->endOfMonth()->format('j') == $this->endDate->format('j'));
 			case "weekend":
-				return 
-					($this->startDate->format('w') == Carbon::FRIDAY) 
+				return
+					($this->startDate->format('w') == Carbon::FRIDAY)
 					&& ($this->endDate->format('w') == Carbon::SUNDAY);
 		}
 	}
@@ -657,7 +657,7 @@ class CalendarController extends PageController
 			$this,
 			__FUNCTION__,
 			FieldList::create(
-				$m = DropdownField::create('Month','', CalendarUtil::get_months_map('%B')),
+				$m = DropdownField::create('Month','', CalendarUtil::get_months_map('F')),
 				$y = DropdownField::create('Year','', array_combine($yearRange, $yearRange))
 			),
 			FieldList::create(
@@ -688,10 +688,10 @@ class CalendarController extends PageController
 
 	public function getOrganiser()
 	{
-		$organiser = $this->config()->default_organiser 
+		$organiser = $this->config()->default_organiser
 			? $this->config()->default_organiser
 			: ":MAILTO:".Email::config()->admin_email;
-			
+
 		$this->extend('updateOrganiser', $organiser);
 		return $organiser;
 	}

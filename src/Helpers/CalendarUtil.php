@@ -6,7 +6,7 @@ use Carbon\Carbon;
 use UncleCheese\EventCalendar\Models\CalendarDateTime;
 use UncleCheese\EventCalendar\Pages\Calendar;
 
-class CalendarUtil 
+class CalendarUtil
 {
 	const ONE_DAY = "OneDay";
 	const SAME_MONTH_SAME_YEAR = "SameMonthSameYear";
@@ -49,30 +49,33 @@ class CalendarUtil
 	 */
 	public static function format_character_replacements($start, $end)
 	{
+        $carbonStart = Carbon::createFromTimestamp($start);
+        $carbonEnd = Carbon::createFromTimestamp($end);
+
 		return [
-			strftime('%a', $start),
-			strftime('%A', $start),
+			$carbonStart->format('D'),
+            $carbonStart->format('l'),
 			date ('j', $start),
 			date ('d', $start),
 			date ('S', $start),
 			date ('n', $start),
 			date ('m', $start),
-			strftime('%b', $start), 
-			strftime('%B', $start), 
-			date ('y', $start), 
+            $carbonStart->format('M'),
+            $carbonStart->format('F'),
+			date ('y', $start),
 			date ('Y', $start),
-			strftime('%a', $end),
-			strftime('%A', $end),
+            $carbonEnd->format('D'),
+            $carbonEnd->format('l'),
 			date ('j', $end),
 			date ('d', $end),
 			date ('S', $end),
 			date ('n', $end),
 			date ('m', $end),
-			strftime('%b', $end), 
-			strftime('%B', $end), 
-			date ('y', $end), 
+            $carbonEnd->format('M'),
+            $carbonEnd->format('F'),
+			date ('y', $end),
 			date ('Y', $end),
-		];	
+		];
 	}
 
 	/**
@@ -84,15 +87,15 @@ class CalendarUtil
 		if (is_array($customDateTemplates) && isset($customDateTemplates[$key])) {
 			$template = $customDateTemplates[$key];
 		} else {
-			$template = _t(Calendar::class.".$key", $key); 
+			$template = _t(Calendar::class.".$key", $key);
 		}
-		
+
 		return str_replace(
-			self::$format_character_placeholders, 
-			self::format_character_replacements($start, $end), 
+			self::$format_character_placeholders,
+			self::format_character_replacements($start, $end),
 			$template
 		);
-	}	
+	}
 
 	/**
 	 * @return string
@@ -110,7 +113,7 @@ class CalendarUtil
 			}
 			return substr($str,0,4) . "-" . substr($str,4,2) . "-" . substr($str,6,2);
 		}
-		
+
 		return date('Y-m-d');
 	}
 
@@ -121,16 +124,16 @@ class CalendarUtil
 	{
 		$strStartDate = null;
 		$strEndDate = null;
-		
+
 		$start = strtotime($startDate);
 		$end = strtotime($endDate);
-		
+
 		$startYear = date("Y", $start);
 		$startMonth = date("m", $start);
-		
+
 		$endYear = date("Y", $end);
 		$endMonth = date("m", $end);
-		
+
 		// Invalid date. Get me out of here!
 		if ($start < 1)	{
 			return;
@@ -144,8 +147,8 @@ class CalendarUtil
 		} else {
 			$key = self::DIFF_MONTH_DIFF_YEAR;
 		}
-		$dateString = self::localize($start, $end, $key);		
-		$break = strpos($dateString, '$End');		
+		$dateString = self::localize($start, $end, $key);
+		$break = strpos($dateString, '$End');
 		if ($break !== false) {
 			$strStartDate = substr($dateString, 0, $break);
 			$strEndDate = substr($dateString, $break+1, strlen($dateString) - strlen($strStartDate));
@@ -178,22 +181,22 @@ class CalendarUtil
 	/**
 	 * @return array
 	 */
-	public static function get_months_map($key = '%b') 
+	public static function get_months_map($format = 'M')
 	{
     	return [
-	  		'01' => strftime($key, strtotime('2000-01-01')),
-	  		'02' => strftime($key, strtotime('2000-02-01')),
-	  		'03' => strftime($key, strtotime('2000-03-01')),
-	  		'04' => strftime($key, strtotime('2000-04-01')),
-	  		'05' => strftime($key, strtotime('2000-05-01')),
-	  		'06' => strftime($key, strtotime('2000-06-01')),
-	  		'07' => strftime($key, strtotime('2000-07-01')),
-	  		'08' => strftime($key, strtotime('2000-08-01')),
-	  		'09' => strftime($key, strtotime('2000-09-01')),
-	  		'10' => strftime($key, strtotime('2000-10-01')),
-	  		'11' => strftime($key, strtotime('2000-11-01')),
-	  		'12' => strftime($key, strtotime('2000-12-01'))
-		];	
+	  		'01' => Carbon::createFromTimestamp(strtotime('2000-01-01'))->format($format),
+	  		'02' => Carbon::createFromTimestamp(strtotime('2000-02-01'))->format($format),
+	  		'03' => Carbon::createFromTimestamp(strtotime('2000-03-01'))->format($format),
+	  		'04' => Carbon::createFromTimestamp(strtotime('2000-04-01'))->format($format),
+	  		'05' => Carbon::createFromTimestamp(strtotime('2000-05-01'))->format($format),
+	  		'06' => Carbon::createFromTimestamp(strtotime('2000-06-01'))->format($format),
+	  		'07' => Carbon::createFromTimestamp(strtotime('2000-07-01'))->format($format),
+	  		'08' => Carbon::createFromTimestamp(strtotime('2000-08-01'))->format($format),
+	  		'09' => Carbon::createFromTimestamp(strtotime('2000-09-01'))->format($format),
+	  		'10' => Carbon::createFromTimestamp(strtotime('2000-10-01'))->format($format),
+	  		'11' => Carbon::createFromTimestamp(strtotime('2000-11-01'))->format($format),
+	  		'12' => Carbon::createFromTimestamp(strtotime('2000-12-01'))->format($format),
+		];
 	}
 
 	/**
@@ -231,7 +234,7 @@ class CalendarUtil
 	{
 		uasort($data, [self::class, "date_sort_callback"]);
 	}
-	
+
 	/**
 	 * Callback used by column_sort
 	 */
