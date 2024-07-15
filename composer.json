@@ -1,5 +1,5 @@
 {
-	"name":"bigfork/silverstripe-event-calendar",
+	"name":"unclecheese/silverstripe-event-calendar",
 	"type": "silverstripe-vendormodule",
 	"description": "Event calendar for the Silverstripe CMS",
 	"keywords": [
@@ -20,7 +20,7 @@
 	"require": {
 		"silverstripe/cms": "^5",
 		"johngrogg/ics-parser": "^2",
-		"nesbot/carbon": "1.39.1"
+		"nesbot/carbon": "^3"
 	},
 	"support": {
 		"issues": "https://github.com/unclecheese/silverstripe-event-calendar/issues"
