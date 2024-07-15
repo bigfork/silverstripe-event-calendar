@@ -2,7 +2,7 @@
 
 /**
  * Date and time for a calendar event occurence
- * 
+ *
  * @author Aaron Carlino
  * @author Grant Heggie
  * @package silverstripe-event-calendar
@@ -20,22 +20,23 @@ use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\FieldType\DBField;
 use SilverStripe\Security\Member;
 use SilverStripe\Security\Permission;
+use SilverStripe\Security\Security;
 use UncleCheese\EventCalendar\Helpers\CalendarUtil;
 use UncleCheese\EventCalendar\Model\CalendarAnnouncement;
 use UncleCheese\EventCalendar\Pages\CalendarEvent;
 
-class CalendarDateTime extends DataObject 
+class CalendarDateTime extends DataObject
 {
 	private static $table_name = 'UncleCheese_CalendarDateTime';
 
-	private static $db = [		
+	private static $db = [
 		'StartDate' => 'Date',
 		'StartTime' => 'Time',
 		'EndDate' => 'Date',
 		'EndTime' => 'Time',
-		'AllDay' => 'Boolean'		
+		'AllDay' => 'Boolean'
 	];
-	
+
 	private static $has_one = [
 		'Event' => CalendarEvent::class
 	];
@@ -62,14 +63,14 @@ class CalendarDateTime extends DataObject
 
 	/**
 	 * Set to the timezone offset (E.g. +12:00 for GMT+12). Must be in ISO 8601 format
-	 * 
+	 *
 	 * @config
 	 * @see http://php.net/manual/en/function.date.php
 	 * @var string
 	 */
 	private static $offset = "+00:00";
 
-	public function getCMSFields() 
+	public function getCMSFields()
 	{
 		$fields = FieldList::create(
 			DateField::create('StartDate', _t(__CLASS__.'.STARTDATE','Start date')),
@@ -116,7 +117,7 @@ class CalendarDateTime extends DataObject
 			]
 		)->renderWith(__CLASS__ .'\DateRange');
 	}
-	
+
 	/**
 	 * @return string
 	 */
@@ -146,10 +147,10 @@ class CalendarDateTime extends DataObject
 			return false;
 		}
 
-		if ($this->Event()->Recursion) {	
+		if ($this->Event()->Recursion) {
 			return $this->Event()->Parent()->getNextRecurringEvents($this->Event(), $this);
 		}
-		
+
 		return self::get()->filter(
 			[
 				'EventID' => $this->EventID,
@@ -197,7 +198,7 @@ class CalendarDateTime extends DataObject
 	{
 		$icsStart = $this->obj('StartDate')->Format('YMMdd')."T".$this->obj('StartTime')->Format('Hmm');
 		if ($this->EndDate) {
-			$icsEnd = $this->obj('EndDate')->Format('YMMdd')."T".$this->obj('EndTime')->Format('Hmm'); 
+			$icsEnd = $this->obj('EndDate')->Format('YMMdd')."T".$this->obj('EndTime')->Format('Hmm');
 		} else {
 			$icsEnd = $icsStart;
 		}
@@ -213,9 +214,9 @@ class CalendarDateTime extends DataObject
 			return Controller::join_links(
 				$this->Calendar()->Link(),
 				"ics",
-				"announcement-".$this->ID, 
+				"announcement-".$this->ID,
 				$icsStart . "-" . $icsEnd
-			); 
+			);
 		}
 		return Controller::join_links(
 			$this->Event()->Parent()->Link(),
@@ -233,11 +234,11 @@ class CalendarDateTime extends DataObject
 		if (!$this->StartDate) {
 			return $this->config()->formatted_field_empty_string;
 		}
-		return CalendarUtil::get_date_format() == "mdy" 
-			? $this->obj('StartDate')->Format('MM-dd-Y') 
+		return CalendarUtil::get_date_format() == "mdy"
+			? $this->obj('StartDate')->Format('MM-dd-Y')
 			: $this->obj('StartDate')->Format('dd-MM-Y');
 	}
-	
+
 	/**
 	 * @return string
 	 */
@@ -246,8 +247,8 @@ class CalendarDateTime extends DataObject
 		if (!$this->EndDate) {
 			return $this->config()->formatted_field_empty_string;
 		}
-		return CalendarUtil::get_date_format() == "mdy" 
-			? $this->obj('EndDate')->Format('MM-dd-Y') 
+		return CalendarUtil::get_date_format() == "mdy"
+			? $this->obj('EndDate')->Format('MM-dd-Y')
 			: $this->obj('EndDate')->Format('dd-MM-Y');
 	}
 
@@ -259,8 +260,8 @@ class CalendarDateTime extends DataObject
 		if (!$this->StartTime) {
 			return $this->config()->formatted_field_empty_string;
 		}
-		return CalendarUtil::get_time_format() == "12" 
-			? $this->obj('StartTime')->Nice() 
+		return CalendarUtil::get_time_format() == "12"
+			? $this->obj('StartTime')->Nice()
 			: Carbon::createFromTimeString($this->StartTime)->format('H:i');
 	}
 
@@ -272,8 +273,8 @@ class CalendarDateTime extends DataObject
 		if (!$this->EndTime) {
 			return $this->config()->formatted_field_empty_string;
 		}
-		return CalendarUtil::get_time_format() == "12" 
-			? $this->obj('EndTime')->Nice() 
+		return CalendarUtil::get_time_format() == "12"
+			? $this->obj('EndTime')->Nice()
 			: Carbon::createFromTimeString($this->EndTime)->format('H:i');
 	}
 
@@ -317,14 +318,14 @@ class CalendarDateTime extends DataObject
 
 		return $dates;
 	}
-	
+
 	/**
 	 * @return bool
 	 */
 	public function canCreate($member = null, $context = [])
 	{
 		if (!$member) {
-			$member = Member::currentUser();
+            $member = Security::getCurrentUser();
 		}
 		$extended = $this->extendedCan(__FUNCTION__, $member);
 		if($extended !== null) {
@@ -339,7 +340,7 @@ class CalendarDateTime extends DataObject
 	public function canEdit($member = null)
 	{
 		if (!$member) {
-			$member = Member::currentUser();
+			$member = Security::getCurrentUser();
 		}
 		$extended = $this->extendedCan(__FUNCTION__, $member);
 		if($extended !== null) {
@@ -354,7 +355,7 @@ class CalendarDateTime extends DataObject
 	public function canDelete($member = null)
 	{
 		if (!$member) {
-			$member = Member::currentUser();
+            $member = Security::getCurrentUser();
 		}
 		$extended = $this->extendedCan(__FUNCTION__, $member);
 		if($extended !== null) {
@@ -369,7 +370,7 @@ class CalendarDateTime extends DataObject
 	public function canView($member = null)
 	{
 		if (!$member) {
-			$member = Member::currentUser();
+            $member = Security::getCurrentUser();
 		}
 		$extended = $this->extendedCan(__FUNCTION__, $member);
 		if($extended !== null) {
