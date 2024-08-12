@@ -31,7 +31,7 @@ class CalendarWidget extends ViewableData
 	public function getDataAttributes()
 	{
 		$attributes = "";
-		$this->options['url'] = $this->calendar->Link();
+		$this->options['url'] = $this->calendar->Link() . '/';
 		foreach ($this->options as $opt => $value) {
 			$attributes .= sprintf('data-%s="%s" ', $opt, Convert::raw2att($value));
 		}
