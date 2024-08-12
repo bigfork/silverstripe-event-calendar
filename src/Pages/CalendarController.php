@@ -302,7 +302,7 @@ class CalendarController extends PageController
 	public function respond()
 	{
 		if (Director::is_ajax()) {
-			return $this->renderWith('EventList');
+			return $this->renderWith('UncleCheese\\EventCalendar\\Includes\\EventList');
 		}
 		return [];
 	}
