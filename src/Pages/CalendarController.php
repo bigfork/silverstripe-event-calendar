@@ -466,6 +466,10 @@ class CalendarController extends PageController
 			$announcementFilter
 		);
 
+        $all = $all->filterByCallback(function($event) {
+            return $event->Event()->exists();
+        });
+
 		$allEventsCount = $all->count();
 		$list = $all->limit($this->EventsPerPage, $this->getOffset());
 		$next = $this->getOffset() + $this->EventsPerPage;
