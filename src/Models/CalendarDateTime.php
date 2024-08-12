@@ -196,9 +196,9 @@ class CalendarDateTime extends DataObject
 	 */
 	public function ICSLink()
 	{
-		$icsStart = $this->obj('StartDate')->Format('YMMdd')."T".$this->obj('StartTime')->Format('Hmm');
+		$icsStart = $this->obj('StartDate')->Format('yMMdd')."T".$this->obj('StartTime')->Format('HHmmss');
 		if ($this->EndDate) {
-			$icsEnd = $this->obj('EndDate')->Format('YMMdd')."T".$this->obj('EndTime')->Format('Hmm');
+			$icsEnd = $this->obj('EndDate')->Format('yMMdd')."T".$this->obj('EndTime')->Format('HHmmss');
 		} else {
 			$icsEnd = $icsStart;
 		}
